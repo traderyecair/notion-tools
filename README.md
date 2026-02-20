@@ -1,7 +1,7 @@
 # TDD Trade Günlüğü - Notion Araçları
 
 Bu depo, TDD Trade Günlüğü için tasarlanmıştır. 
-**TDD Trade Günlüğü**, trader'ların işlemlerini, stratejilerini, psikolojilerini ve risk yönetimlerini tek bir merkezden profesyonelce takip edebilmeleri için hazırlanmış kapsamlı bir Notion şablonudur. Sadece bir kayıt defteri değil, aynı zamanda hatalarınızı görmenizi ve gelişiminizi takip etmenizi sağlayan bir analiz merkezidir.
+**TDD Trade Günlüğü**, traderların işlemlerini, stratejilerini, psikolojilerini ve risk yönetimlerini tek bir merkezden profesyonelce takip edebilmeleri için hazırlanmış kapsamlı bir Notion şablonudur. Sadece bir kayıt defteri değil, aynı zamanda hatalarınızı görmenizi ve gelişiminizi takip etmenizi sağlayan bir analiz merkezidir.
 
 **[TDD Trade Günlüğü Şablonunu İncelemek ve Edinmek İçin Tıklayın](https://tdd-tradegunlugu.notion.site/dashboard)**
 
@@ -82,4 +82,5 @@ Projeyi forklayıp GitHub deponuzun **Settings > Pages** sekmesinden yayınladı
 ---
 
 *Bu TDD Trade Günlüğü **yecair** tarafından yapılmıştır. Beni takip etmek isterseniz X hesabım: **[x.com/traderyecair](https://x.com/traderyecair)***
+
 
