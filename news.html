@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Calendar</title>
+    <style>
+        /* Ana Sayfa Yapısı */
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: #191919; 
+            overflow: hidden;
+            font-family: "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+        }
+
+        /* Sabit ve Profesyonel Üst Panel */
+        .calendar-header {
+            display: flex;
+            background-color: #1e222d; /* TradingView koyu gri */
+            color: #b2b5be;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 12px 10px;
+            border-bottom: 1px solid #2a2e39;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Sütun Hizalamaları (Widget ile Senkronize) */
+        .col-time { flex: 0 0 15%; text-align: left; color: #2962ff; } /* Saat mavi vurgu */
+        .col-event { flex: 1; padding-left: 10px; }
+        .col-data { flex: 0 0 30%; text-align: right; }
+
+        .widget-container {
+            width: 100%;
+            height: calc(100% - 40px); /* Üst bar yüksekliği kadar pay bırakıldı */
+            position: relative;
+        }
+
+        /* Widget Geliştirmeleri */
+        .tradingview-widget-container {
+            width: 100%;
+            height: 100%;
+            /* Dar alanlarda yazıların okunabilirliğini artırır */
+            filter: contrast(1.1) brightness(1.15); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calendar-header">
+        <div class="col-time">SAAT</div>
+        <div class="col-event">HABER</div>
+        <div class="col-data">BEKLENTİ / ÖNCEKİ</div>
+    </div>
+
+    <div class="widget-container">
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+            {
+                "colorTheme": "dark",
+                "isTransparent": true,
+                "width": "100%",
+                "height": "100%",
+                "locale": "tr",
+                "importanceFilter": "0,1",
+                "currencyFilter": "USD,EUR,GBP,JPY,AUD,NZD,CAD,TRY",
+                "countryFilter": "us,eu,gb,jp,au,nz,ca,tr,de,fr"
+            }
+            </script>
+        </div>
+    </div>
+
+</body>
+</html>

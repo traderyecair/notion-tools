@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticker Tape</title>
+    <style>
+        /* Sayfa Ayarları */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #191919;
+            /* Notion Gri */
+            overflow: hidden;
+        }
+
+        /* MAKASLAMA KUTUSU */
+        .crop-container {
+            width: 100%;
+            height: 90px;
+            /* Sabit Yükseklik */
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Widget Geliştirmesi */
+        tv-ticker-tape {
+            display: block;
+            width: 100%;
+            height: 100%;
+            filter: contrast(1.2) saturate(1.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="crop-container">
+        <script type="module" src="https://widgets.tradingview-widget.com/w/tr/tv-ticker-tape.js"></script>
+
+        <tv-ticker-tape
+            symbols='CAPITALCOM:DXY,OANDA:EURUSD,OANDA:GBPUSD,OANDA:XAUUSD,OANDA:XAGUSD,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:SOLUSDT,BINANCE:AVAXUSDT,FOREXCOM:SPX500,FOREXCOM:NAS100,BINANCE:USDTTRY,FOREXCOM:USDTRY'
+            theme="dark" transparent>
+        </tv-ticker-tape>
+    </div>
+
+</body>
+
+</html>

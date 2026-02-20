@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trade Calculator</title>
+    <style>
+        /* RESET & TEMEL */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #191919;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Inter", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* KART YAPISI */
+        .terminal-card {
+            background-color: #202020;
+            width: 100%;
+            height: 100%;
+            min-height: 480px;
+            padding: 12px;
+            border: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+            margin-bottom: 2px;
+        }
+
+        .title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #777;
+            text-transform: uppercase;
+            cursor: default;
+            user-select: none;
+        }
+
+        /* GRID & INPUTS */
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 9px;
+            color: #666;
+            margin-bottom: 3px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        /* INPUT STİLİ */
+        input,
+        select {
+            width: 100%;
+            background-color: #141414;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-family: inherit;
+            cursor: text;
+            touch-action: manipulation;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #555;
+            background-color: #1a1a1a;
+        }
+
+        ::placeholder {
+            color: #333;
+        }
+
+        /* HIZLI RİSK BUTONLARI */
+        .quick-risk-bar {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            justify-content: space-between;
+        }
+
+        .q-btn {
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            color: #777;
+            font-size: 9px;
+            flex: 1;
+            text-align: center;
+            padding: 4px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .q-btn:hover {
+            background-color: #3a7bd5;
+            color: #fff;
+            border-color: #3a7bd5;
+        }
+
+        /* INPUT ALTI YARDIMCI YAZI (PIP SAYACI) */
+        .input-helper {
+            font-size: 10px;
+            color: #555;
+            text-align: right;
+            margin-top: 3px;
+            font-family: 'Roboto Mono', monospace;
+            height: 12px;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        /* SONUÇ PANELİ */
+        .result-panel {
+            background-color: #161616;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 60px;
+        }
+
+        .lot-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            margin-top: 2px;
+        }
+
+        .result-value {
+            font-size: 38px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        /* Kopyala Butonu */
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+            background-color: #2a2a2a;
+        }
+
+        .copy-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* İSTATİSTİKLER */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px;
+            border-top: 1px dashed #333;
+            padding-top: 8px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 2px;
+            font-weight: 800;
+            user-select: none;
+        }
+
+        .stat-val {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ddd;
+        }
+
+        /* RENKLER */
+        .accent-long {
+            color: #2ecc71 !important;
+        }
+
+        .accent-short {
+            color: #e74c3c !important;
+        }
+
+        .border-long {
+            border-color: rgba(46, 204, 113, 0.4) !important;
+        }
+
+        .border-short {
+            border-color: rgba(231, 76, 60, 0.4) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="terminal-card" onclick="this.focus()">
+        <div class="header">
+            <span class="title">TRADE CALCULATOR</span>
+            <div style="width:6px; height:6px; background:#333; border-radius:50%;" id="statusDot"></div>
+        </div>
+
+        <div class="grid-row">
+            <div>
+                <label>PARİTE</label>
+                <select id="parity" onchange="calc(); saveSettings();">
+                    <option value="eurusd">EUR/USD</option>
+                    <option value="gbpusd">GBP/USD</option>
+                    <option value="gold">XAU/USD</option>
+                    <option value="silver">XAG/USD</option>
+                    <option value="btcusd">BTC/USD</option>
+                    <option value="ethusd">ETH/USD</option>
+                </select>
+            </div>
+            <div>
+                <label>RİSK ($)</label>
+                <input type="number" id="risk" placeholder="0" onkeyup="calc(); saveSettings();"
+                    onclick="this.select()">
+
+                <div class="quick-risk-bar">
+                    <div class="q-btn" onclick="setRisk(250)">250</div>
+                    <div class="q-btn" onclick="setRisk(500)">500</div>
+                    <div class="q-btn" onclick="setRisk(750)">750</div>
+                    <div class="q-btn" onclick="setRisk(1000)">1k</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-row">
+            <div>
+                <label>GİRİŞ</label>
+                <input type="number" id="entry" placeholder="0.00000" onkeyup="calc()" onclick="this.select()">
+                <div class="input-helper"></div>
+            </div>
+            <div>
+                <label>STOP (SL)</label>
+                <input type="number" id="stop" placeholder="0.00000" onkeyup="calc()" onclick="this.select()">
+                <div id="distHelper" class="input-helper">--</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 2px;">
+            <label>HEDEF (TP)</label>
+            <input type="number" id="tp" placeholder="0.00000" onkeyup="calc()" onclick="this.select()">
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+            <div class="lot-wrapper">
+                <div class="result-value" id="result">0.00</div>
+                <button class="copy-btn" onclick="copyLot()" title="Kopyala">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-box">
+                    <div class="stat-label">YÖN</div>
+                    <div class="stat-val" id="dirVal">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">R:R</div>
+                    <div class="stat-val" id="rrVal">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">KAR/ZARAR</div>
+                    <div class="stat-val" id="profitVal">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            const savedRisk = localStorage.getItem('tradeCalc_risk');
+            const savedParity = localStorage.getItem('tradeCalc_parity');
+            if (savedRisk) document.getElementById('risk').value = savedRisk;
+            if (savedParity) document.getElementById('parity').value = savedParity;
+        }
+
+        function saveSettings() {
+            const risk = document.getElementById('risk').value;
+            const parity = document.getElementById('parity').value;
+            localStorage.setItem('tradeCalc_risk', risk);
+            localStorage.setItem('tradeCalc_parity', parity);
+        }
+
+        function setRisk(amount) {
+            document.getElementById('risk').value = amount;
+            calc();
+            saveSettings();
+        }
+
+        function calc() {
+            const parity = document.getElementById('parity').value;
+            const risk = parseFloat(document.getElementById('risk').value);
+            const entry = parseFloat(document.getElementById('entry').value);
+            const stop = parseFloat(document.getElementById('stop').value);
+            const tp = parseFloat(document.getElementById('tp').value);
+
+            const resEl = document.getElementById('result');
+            const dirEl = document.getElementById('dirVal');
+            const distHelper = document.getElementById('distHelper');
+            const rrEl = document.getElementById('rrVal');
+            const profitEl = document.getElementById('profitVal');
+            const panelEl = document.getElementById('resultPanel');
+            const statsGrid = document.getElementById('statsGrid');
+            const dot = document.getElementById('statusDot');
+
+            resEl.style.color = "#fff";
+            panelEl.className = "result-panel";
+            dirEl.style.color = "#ccc";
+            distHelper.style.color = "#555";
+
+            if (!risk || !entry || !stop || entry === stop) {
+                resEl.innerText = "0.00";
+                dirEl.innerText = "--";
+                distHelper.innerText = "--";
+                rrEl.innerText = "--";
+                profitEl.innerText = "--";
+                statsGrid.style.opacity = "0.4";
+                dot.style.background = "#333";
+                dot.style.boxShadow = "none";
+                return;
+            }
+
+            let cSize = 100000;
+            let pipMult = 10000;
+            let suffix = "pips";
+
+            if (parity === 'gold') { cSize = 100; pipMult = 10; suffix = "pts"; }
+            if (parity === 'silver') { cSize = 5000; pipMult = 100; suffix = "pts"; }
+            if (parity === 'btcusd' || parity === 'ethusd') { cSize = 1; pipMult = 1; suffix = "$"; }
+
+            const stopDist = Math.abs(entry - stop);
+            const lot = risk / (stopDist * cSize);
+            resEl.innerText = lot.toFixed(2);
+
+            const isLong = entry > stop;
+
+            if (isLong) {
+                dirEl.innerText = "LONG";
+                dirEl.style.color = "#2ecc71";
+                resEl.className = "result-value accent-long";
+                panelEl.classList.add("border-long");
+                dot.style.background = "#2ecc71";
+                dot.style.boxShadow = "0 0 8px #2ecc71";
+            } else {
+                dirEl.innerText = "SHORT";
+                dirEl.style.color = "#e74c3c";
+                resEl.className = "result-value accent-short";
+                panelEl.classList.add("border-short");
+                dot.style.background = "#e74c3c";
+                dot.style.boxShadow = "0 0 8px #e74c3c";
+            }
+
+            const pips = (stopDist * pipMult).toFixed(1);
+            distHelper.innerText = pips + " " + suffix;
+            distHelper.style.color = "#888";
+
+            if (tp && tp !== entry) {
+                statsGrid.style.opacity = "1";
+                const tpDist = Math.abs(entry - tp);
+                const rr = (tpDist / stopDist).toFixed(2);
+                rrEl.innerText = "1: " + rr;
+                const potentialProfit = risk * rr;
+                profitEl.innerText = "$" + potentialProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 });
+                profitEl.style.color = "#fff";
+            } else {
+                statsGrid.style.opacity = "0.8";
+                rrEl.innerText = "--";
+                profitEl.innerText = "--";
+            }
+        }
+
+        function copyLot() {
+            const val = document.getElementById('result').innerText;
+            if (val === "0.00") return;
+            const textArea = document.createElement("textarea");
+            textArea.value = val;
+            textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            try { const successful = document.execCommand('copy'); if (successful) animateButton(); } catch (err) { }
+            document.body.removeChild(textArea);
+        }
+
+        function animateButton() {
+            const btn = document.querySelector('.copy-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 1000);
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessions</title>
+    <style>
+        /* TEMEL AYARLAR */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #191919;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #2a2e39;
+            padding-bottom: 10px;
+        }
+
+        /* ROZET */
+        .market-badge {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .badge-closed {
+            background: #2a2e39;
+            color: #888;
+            border: 1px solid #363c4e;
+        }
+
+        .badge-open {
+            background: rgba(8, 153, 129, 0.15);
+            color: #089981;
+            border: 1px solid #089981;
+            box-shadow: 0 0 15px rgba(8, 153, 129, 0.1);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #089981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            display: none;
+            box-shadow: 0 0 5px #089981;
+        }
+
+        .badge-open .live-dot {
+            display: block;
+        }
+
+        /* SAAT */
+        .live-clock {
+            font-size: 26px;
+            font-weight: 800;
+            color: #d1d4dc;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* TIMELINE KONTEYNER */
+        .timeline-container {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: #202020;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2e39;
+            overflow: hidden;
+        }
+
+        /* IZGARA ÇİZGİLERİ */
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .custom-grid-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            border-right: 1px dashed #363c4e;
+        }
+
+        /* SAAT ETİKETLERİ */
+        .grid-label {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #666;
+            font-weight: 600;
+            background-color: #202020;
+            padding: 0 4px;
+        }
+
+        /* SEANS BARLARI */
+        .track-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            top: 10px;
+        }
+
+        .session-bar {
+            position: absolute;
+            height: 20px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            background: #333;
+            color: #777;
+            border: 1px solid #444;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .bar-active {
+            opacity: 1;
+            height: 22px;
+            z-index: 5;
+            color: #fff;
+            border: none;
+        }
+
+        .bar-sydney.bar-active {
+            background: #8D6E63;
+            color: #fff;
+        }
+
+        .bar-tokyo.bar-active {
+            background: #546E7A;
+            color: #fff;
+        }
+
+        .bar-london.bar-active {
+            background: #1565C0;
+            color: #fff;
+        }
+
+        .bar-newyork.bar-active {
+            background: #D84315;
+            color: #fff;
+        }
+
+        .cursor {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #d1d4dc;
+            z-index: 20;
+            transition: left 1s linear;
+        }
+
+        /* KARTLAR */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            background: #252525;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            border-left: 4px solid #363c4e;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .city-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #363c4e;
+        }
+
+        .time-range {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .countdown {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .card.active {
+            background: #2a2e39;
+        }
+
+        .card.active .status-dot {
+            background: #089981;
+            box-shadow: 0 0 5px #089981;
+        }
+
+        .card.active.sydney {
+            border-left-color: #8D6E63;
+        }
+
+        .card.active.tokyo {
+            border-left-color: #546E7A;
+        }
+
+        .card.active.london {
+            border-left-color: #1565C0;
+        }
+
+        .card.active.newyork {
+            border-left-color: #D84315;
+        }
+
+        .text-green {
+            color: #089981;
+        }
+
+        .text-red {
+            color: #f23645;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(8, 153, 129, 0.4);
+            }
+
+            70% {
+                opacity: 1;
+                box-shadow: 0 0 0 6px rgba(8, 153, 129, 0);
+            }
+
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(8, 153, 129, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div id="dynamic-badge" class="market-badge badge-closed">
+            <div class="live-dot"></div>
+            <span id="badge-text">MARKET KAPALI</span>
+        </div>
+        <div class="live-clock" id="clock">00:00:00</div>
+    </div>
+
+    <div class="timeline-container">
+        <div class="grid-lines">
+            <div class="custom-grid-line" style="left: 16.66%;">
+                <div class="grid-label">04:00</div>
+            </div>
+            <div class="custom-grid-line" style="left: 41.66%;">
+                <div class="grid-label">10:00</div>
+            </div>
+            <div class="custom-grid-line" style="left: 66.66%;">
+                <div class="grid-label">16:00</div>
+            </div>
+            <div class="custom-grid-line" style="left: 91.66%;">
+                <div class="grid-label">22:00</div>
+            </div>
+        </div>
+
+        <div class="track-wrapper">
+            <div id="bar-sydney" class="session-bar bar-sydney" style="left: 0%; width: 33.33%;">SYDNEY</div>
+            <div id="bar-tokyo" class="session-bar bar-tokyo" style="left: 12.5%; width: 37.5%; top: 28px;">TOKYO</div>
+            <div id="bar-london" class="session-bar bar-london" style="left: 45.83%; width: 37.5%; top: 56px;">LONDON
+            </div>
+            <div id="bar-newyork" class="session-bar bar-newyork" style="left: 66.66%; width: 37.5%; top: 84px;">NEW
+                YORK</div>
+        </div>
+
+        <div class="cursor" id="cursor"></div>
+    </div>
+
+    <div class="cards-grid" id="cards-container"></div>
+
+    <script>
+        const baseSessions = [
+            { id: 'sydney', name: 'SYDNEY', start: 23, end: 8, theme: 'sydney' },
+            { id: 'tokyo', name: 'TOKYO', start: 3, end: 12, theme: 'tokyo' },
+            { id: 'london', name: 'LONDON', start: 11, end: 20, theme: 'london' },
+            { id: 'newyork', name: 'NEW YORK', start: 16, end: 1, theme: 'newyork' }
+        ];
+
+        function update() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const day = now.getDay();
+            const year = now.getFullYear();
+            const dstStart = new Date(year, 2, 8);
+            dstStart.setDate(dstStart.getDate() + (7 - dstStart.getDay()) % 7);
+            const dstEnd = new Date(year, 10, 1);
+            dstEnd.setDate(dstEnd.getDate() + (7 - dstEnd.getDay()) % 7);
+
+            const isDST = now >= dstStart && now < dstEnd;
+
+            const sessions = baseSessions.map(sess => {
+                let adjStart = sess.start;
+                let adjEnd = sess.end;
+
+                if (isDST) {
+                    if (sess.id === 'newyork' || sess.id === 'london') {
+                        adjStart = (sess.start - 1 + 24) % 24;
+                        adjEnd = (sess.end - 1 + 24) % 24;
+                    } else if (sess.id === 'sydney') {
+                        adjStart = (sess.start + 1) % 24;
+                        adjEnd = (sess.end + 1) % 24;
+                    }
+                }
+                return { ...sess, start: adjStart, end: adjEnd };
+            });
+
+            // HAFTASONU KONTROLÜ (Cumartesi 01:00'da kapanır, Pazar 23:00'da açılır)
+            const isWeekend = (day === 6 && h >= 1) || (day === 0 && h < 23);
+            document.getElementById('clock').innerText =
+                `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+            const totalMin = (h * 60) + m;
+            const percent = (totalMin / 1440) * 100;
+            document.getElementById('cursor').style.left = `${percent}%`;
+
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            let activeSessions = [];
+
+            sessions.forEach(sess => {
+                let isOpen = false;
+                if (!isWeekend) {
+                    if (sess.start < sess.end) isOpen = h >= sess.start && h < sess.end;
+                    else isOpen = h >= sess.start || h < sess.end;
+                }
+                const bar = document.getElementById(`bar-${sess.id}`);
+                if (isOpen) {
+                    bar.classList.add('bar-active');
+                    activeSessions.push(sess.id);
+                } else {
+                    bar.classList.remove('bar-active');
+                }
+                let timerText = "", timerClass = "";
+
+                if (isWeekend) {
+                    timerText = ``; // Bireysel kartlarda haftasonu yazmasına gerek yok
+                    timerClass = "text-red";
+                } else if (isOpen) {
+                    let end = sess.end; let diffH = end - h - 1; let diffM = 60 - m;
+                    if (diffH < 0) diffH += 24;
+                    timerText = `Kapanışa: ${diffH}s ${diffM}dk`;
+                    timerClass = "text-green";
+                } else {
+                    let start = sess.start; let diffH = start - h - 1; let diffM = 60 - m;
+                    if (diffH < 0) diffH += 24;
+                    timerText = `Açılışa: ${diffH}s ${diffM}dk`;
+                    timerClass = "text-red";
+                }
+
+                const card = document.createElement('div');
+                card.className = `card ${sess.theme} ${isOpen ? 'active' : ''}`;
+                card.innerHTML = `
+                    <div class="card-header"><span class="city-name">${sess.name}</span><div class="status-dot"></div></div>
+                    <div class="time-range">${String(sess.start).padStart(2, '0')}:00 - ${String(sess.end).padStart(2, '0')}:00</div>
+                    <div class="countdown ${timerClass}">${timerText}</div>
+                `;
+                container.appendChild(card);
+            });
+
+            const badge = document.getElementById('dynamic-badge');
+            const badgeText = document.getElementById('badge-text');
+            badge.className = 'market-badge badge-open';
+
+            const isSyd = activeSessions.includes('sydney');
+            const isTok = activeSessions.includes('tokyo');
+            const isLon = activeSessions.includes('london');
+            const isNy = activeSessions.includes('newyork');
+
+            if (isWeekend) {
+                badgeText.innerText = "PİYASALAR KAPALI";
+                badge.className = 'market-badge badge-closed';
+            }
+            else if (activeSessions.length === 0) {
+                badgeText.innerText = "PİYASALAR KAPALI";
+                badge.className = 'market-badge badge-closed';
+            }
+            else if (isLon && isNy) badgeText.innerText = "LONDON & NEW YORK";
+            else if (isLon) badgeText.innerText = "LONDON OPEN";
+            else if (isNy) badgeText.innerText = "NEW YORK OPEN";
+            else if (isSyd && isTok) badgeText.innerText = "ASIA SESSION";
+            else if (isTok) badgeText.innerText = "TOKYO OPEN";
+            else if (isSyd) badgeText.innerText = "SYDNEY OPEN";
+        }
+
+        setInterval(update, 1000);
+        update();
+    </script>
+</body>
+
+</html>
